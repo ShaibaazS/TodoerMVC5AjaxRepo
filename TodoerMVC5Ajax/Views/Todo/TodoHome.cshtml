@@ -1,0 +1,119 @@
+﻿
+@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>TodoHome</title>
+    <link href="~/Content/bootstrap.css" rel="stylesheet" />
+</head>
+
+<body>
+    <form id="form1">
+        <div class="container-fluid">
+            <div class="row form-group">
+                <div class="col-sm-1">Title:</div>
+                <div class="col-sm-2"><input type="text" class="form-control" name="Title" /></div>
+            </div>
+            <div class="row form-group">
+                <div class="col-sm-1">Description:</div>
+                <div class="col-sm-2"><input type="text" class="form-control" name="Description" /></div>
+            </div>
+            <div class="row form-group">
+                <div class="col-sm-1">Status:</div>
+                <div class="col-sm-1">
+                    <input type="radio" name="Status" value="In Progress" />
+                    <label class="control-label">In Progress</label>
+                </div>
+                <div class="col-sm-1">
+                    <input type="radio" name="Status" value="On Hold" />
+                    <label class="control-label">On Hold</label>
+                </div>
+                <div class="col-sm-1">
+                    <input type="radio" name="Status" value="Complete" />
+                    <label class="control-label">Complete</label>
+                </div>
+            </div>
+            <div class="row form-group">
+                <div class="col-sm-1 col-sm-offset-1">
+                    <input type="submit" class="form-control btn btn-primary" value="button" onclick="SubmitData();" />
+                </div>
+            </div>
+            <div class="row form-group">
+                <div class="col-sm-6 table-responsive">
+                    <table id="tbl" class="table table-bordered table-condensed">
+                        <tr>
+                            <th>Id</th>
+                            <th>Title</th>
+                            <th>Description</th>
+                            <th>Status</th>
+                            <th></th>
+                            <th></th>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </form>
+    <script src="~/Scripts/jquery-3.4.1.js"></script>
+    <script src="~/Scripts/jquery.validate.js"></script>
+    <script src="~/Scripts/jquery.validate.unobtrusive.js"></script>
+    <script language="javascript">
+        $.get("TodoSelect", null, BindData);
+
+        function BindData(Todos) {
+            var tbl = $("#tbl");
+            for (var i = 0; i < Todos.length; i++) {
+                var newRow = "<tr>" +
+                    "<td>" + Todos[i].Id + "</td>" +
+                    "<td>" + Todos[i].Title + "</td>" +
+                    "<td>" + Todos[i].Description + "</td>" +
+                    "<td>" + Todos[i].Status + "</td>" +
+                    "<td><input type='button' class='btn btn-sm btn-primary' id='btnDel_" + Todos[i].Id + "' value='Delete' onclick='DeleteData(" + Todos[i].Id + ")' /></td>" +
+                    "<td><input type='button' class='btn btn-sm btn-primary' class='btn' id='btnUp_" + Todos[i].Id + "' value='Edit' onclick='EditControls(" + Todos[i].Id + ")' /></td>" +
+                    "</tr>";
+                tbl.append(newRow);
+            }
+        }
+
+        function SubmitData() {
+            var frm = $("#form1").serialize();
+            $.post("TodoInsert", frm, BindData);
+        }
+
+        //$("#tbl tbody").on('click', '.btn', function () {
+        //    var currRow = $(this).closest("tr");
+        //    var col1 = currRow.find('td:eq(0)').text();
+        //    alert(col1);
+        //});
+
+        function EditControls(Id) {
+            $("#tbl tr").each(function () {
+                var self = $(this);
+                var col_1_value = self.find("td:eq(0)").text().trim();
+                if (col_1_value == Id) {
+                    self.find("td:eq(1)").html("<input type='text' value="+ self.find("td:eq(1)").text().trim() +" name='txtTitle" + Id + "' />");
+                    self.find("td:eq(2)").html("<input type='text' value=" + self.find("td:eq(2)").text().trim() + " name='txtDescription" + Id + "' />");
+                    self.find("td:eq(3)").html("<input type='text' value=" + self.find("td:eq(3)").text().trim() + " name='txtStatus" + Id + "' />");
+                    self.find("td:eq(5)").html("<input type='button' name='btnUpdate" + Id + "' value='Update' onclick='UpdateData("+ Id +");' />");
+                }
+            });
+
+        }
+
+        function UpdateData(Id) {
+            //alert(Id);
+            var frm = $("#form1").serialize();
+            $.post("TodoUpdate/" + Id, frm, BindData);
+        }
+
+        function DeleteData(Id) {
+            $.post("TodoDelete/" + Id, null, BindData);
+        }
+    </script>
+</body>
+</html>
