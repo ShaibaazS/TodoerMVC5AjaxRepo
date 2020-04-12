@@ -52,7 +52,7 @@ namespace TodoerMVC5Ajax.Controllers
             todo.Description = Request.Form["txtDescription" + Id];
             todo.Status = Request.Form["txtStatus" + Id];
             dal.SaveChanges();
-
+            // Access Data Layer
             DataLayer.DataLayer dal1 = new DataLayer.DataLayer();
             List<Todo> todos = dal1.Todos.ToList<Todo>();
             return Json(todos, JsonRequestBehavior.AllowGet);
